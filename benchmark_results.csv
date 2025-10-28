@@ -1,0 +1,4 @@
+target,mode,requests,concurrency,total_time_s,throughput_rps,avg_latency_ms,p95_latency_ms
+http://localhost:8001,cache_put,500,50,2.336,214.03,231.95,270.61
+http://localhost:8001,cache_put,1000,100,4.56,219.29,450.92,519.37
+http://localhost:8002,cache_get,1000,100,3.001,333.18,294.85,335.0

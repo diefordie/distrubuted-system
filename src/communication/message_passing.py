@@ -1,15 +1,8 @@
-# src/communication/message_passing.py
+
 import aiohttp
 from loguru import logger
 
 async def send_json(target_url: str, endpoint: str, payload: dict, timeout: float = 3.0):
-    """
-    Mengirimkan request JSON ke node lain.
-    target_url: alamat node target, misalnya http://node2:8002
-    endpoint: endpoint tujuan (contoh: /raft/request_vote)
-    payload: data JSON yang dikirim
-    timeout: batas waktu request
-    """
     url = f"{target_url.rstrip('/')}{endpoint}"
 
     try:

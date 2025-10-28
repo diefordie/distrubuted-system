@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
   title: Distributed System Node API
-  version: 1.0.0
+  version: 1.1.0
   description: |
     Distributed Synchronization System with Raft consensus, distributed locks,
-    cache coherence, and message queue.
+    cache coherence (MESI), and distributed message queue.
 
 servers:
   - url: http://localhost:8001
@@ -22,7 +22,7 @@ tags:
   - name: Locks
     description: Distributed lock management
   - name: Cache
-    description: Distributed cache with MESI
+    description: Distributed cache with MESI coherence protocol
   - name: Queue
     description: Distributed message queue
   - name: Monitoring
@@ -153,6 +153,14 @@ paths:
       responses:
         '200':
           description: Value stored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
 
   /cache/get:
     get:
@@ -167,6 +175,38 @@ paths:
       responses:
         '200':
           description: Cache hit or miss
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  value:
+                    type: object
+                  state:
+                    type: string
+                    enum: [Modified, Exclusive, Shared, Invalid]
+                  source_node:
+                    type: string
+                    example: node3
+
+  /cache/debug:
+    get:
+      summary: Inspect Cache State
+      description: |
+        Returns all cache entries in this node, including key, value, MESI state,
+        source node, and last update timestamp. Useful for debugging cache coherence.
+      tags: [Cache]
+      responses:
+        '200':
+          description: Current cache contents
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/CacheEntry'
 
   /queue/push:
     post:
@@ -248,3 +288,25 @@ components:
           type: string
         client_id:
           type: string
+
+    CacheEntry:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: object
+        state:
+          type: string
+          enum: [Modified, Exclusive, Shared, Invalid]
+        ttl:
+          type: integer
+          nullable: true
+        source_node:
+          type: string
+          description: Node ID from which the value originated
+          example: node3
+        last_updated:
+          type: number
+          format: float
+          description: UNIX timestamp of last cache update

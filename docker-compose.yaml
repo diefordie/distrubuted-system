@@ -11,8 +11,7 @@ services:
       - NODE_PORT=8001
       - CLUSTER_ADDRS=http://node1:8001,http://node2:8002,http://node3:8003
       - REDIS_HOST=redis
-      - PYTHONUNBUFFERED=1  # Add this to force unbuffered logging
-    ports:
+      - PYTHONUNBUFFERED=1 
       - "8001:8001"
     depends_on:
       - redis
@@ -23,7 +22,7 @@ services:
       - NODE_PORT=8002
       - CLUSTER_ADDRS=http://node1:8001,http://node2:8002,http://node3:8003
       - REDIS_HOST=redis
-      - PYTHONUNBUFFERED=1  # Add this
+      - PYTHONUNBUFFERED=1  
     ports:
       - "8002:8002"
     depends_on:
@@ -35,7 +34,7 @@ services:
       - NODE_PORT=8003
       - CLUSTER_ADDRS=http://node1:8001,http://node2:8002,http://node3:8003
       - REDIS_HOST=redis
-      - PYTHONUNBUFFERED=1  # Add this
+      - PYTHONUNBUFFERED=1  
     ports:
       - "8003:8003"
     depends_on:

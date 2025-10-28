@@ -1,4 +1,4 @@
-# src/utils/redis_client.py
+
 import redis.asyncio as redis
 from loguru import logger
 from src.utils.config import REDIS_URL
@@ -7,10 +7,6 @@ _redis = None
 _redis_lock = None
 
 async def get_redis():
-    """
-    Get or create Redis connection singleton.
-    Includes retry logic and error handling.
-    """
     global _redis, _redis_lock
     
     if _redis_lock is None:
@@ -29,7 +25,7 @@ async def get_redis():
                     socket_keepalive=True,
                     retry_on_timeout=True
                 )
-                # Test connection
+                
                 await _redis.ping()
                 logger.success(f"✅ Redis connected: {REDIS_URL}")
             except redis.ConnectionError as e:
@@ -43,7 +39,6 @@ async def get_redis():
         return _redis
 
 async def close_redis():
-    """Close Redis connection gracefully"""
     global _redis
     if _redis:
         try:
@@ -55,7 +50,6 @@ async def close_redis():
             _redis = None
 
 async def check_redis_health():
-    """Check if Redis is available and responsive"""
     try:
         r = await get_redis()
         if r:
@@ -66,9 +60,8 @@ async def check_redis_health():
     return False
 
 
-# Helper functions for common Redis operations
+
 async def redis_set_with_retry(key: str, value: str, ex: int = None, max_retries: int = 3):
-    """Set value in Redis with retry logic"""
     r = await get_redis()
     if not r:
         return False
@@ -88,7 +81,6 @@ async def redis_set_with_retry(key: str, value: str, ex: int = None, max_retries
     return False
 
 async def redis_get_with_retry(key: str, max_retries: int = 3):
-    """Get value from Redis with retry logic"""
     r = await get_redis()
     if not r:
         return None
@@ -104,7 +96,6 @@ async def redis_get_with_retry(key: str, max_retries: int = 3):
     return None
 
 async def redis_delete_with_retry(key: str, max_retries: int = 3):
-    """Delete key from Redis with retry logic"""
     r = await get_redis()
     if not r:
         return False

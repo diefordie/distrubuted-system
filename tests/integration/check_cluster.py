@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-"""
-Quick script to check cluster status before running integration tests
-"""
+
 import asyncio
 import aiohttp
 
@@ -17,7 +14,7 @@ async def check_cluster():
     async with aiohttp.ClientSession() as session:
         for node_addr in NODES:
             try:
-                # Health check
+                
                 async with session.get(f"{node_addr}/health", timeout=aiohttp.ClientTimeout(total=2)) as resp:
                     if resp.status == 200:
                         print(f"✅ {node_addr} - HEALTHY")
@@ -25,7 +22,7 @@ async def check_cluster():
                         print(f"⚠️  {node_addr} - Unhealthy (status {resp.status})")
                         continue
                 
-                # Cluster status
+                
                 async with session.get(f"{node_addr}/cluster/status", timeout=aiohttp.ClientTimeout(total=2)) as resp:
                     data = await resp.json()
                     raft = data.get("raft", {})
