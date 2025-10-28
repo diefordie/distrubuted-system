@@ -1,0 +1,12 @@
+aiohttp
+redis>=4.5.0
+pytest
+pytest-asyncio
+loguru
+pydantic
+python-dotenv
+aiohttp-swagger3==0.8.0
+pytest
+pytest-asyncio
+
+

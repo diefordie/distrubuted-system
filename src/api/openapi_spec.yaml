@@ -1,0 +1,250 @@
+openapi: 3.0.0
+info:
+  title: Distributed System Node API
+  version: 1.0.0
+  description: |
+    Distributed Synchronization System with Raft consensus, distributed locks,
+    cache coherence, and message queue.
+
+servers:
+  - url: http://localhost:8001
+    description: Node 1
+  - url: http://localhost:8002
+    description: Node 2
+  - url: http://localhost:8003
+    description: Node 3
+
+tags:
+  - name: System
+    description: System health and information
+  - name: Raft
+    description: Raft consensus endpoints
+  - name: Locks
+    description: Distributed lock management
+  - name: Cache
+    description: Distributed cache with MESI
+  - name: Queue
+    description: Distributed message queue
+  - name: Monitoring
+    description: Metrics and monitoring
+
+paths:
+  /:
+    get:
+      summary: API Information
+      tags: [System]
+      responses:
+        '200':
+          description: Basic API information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiInfo'
+
+  /health:
+    get:
+      summary: Health Check
+      tags: [System]
+      responses:
+        '200':
+          description: Node health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  /cluster/status:
+    get:
+      summary: Cluster Status
+      tags: [System]
+      responses:
+        '200':
+          description: Detailed cluster information
+
+  /metrics:
+    get:
+      summary: Node Metrics
+      tags: [Monitoring]
+      responses:
+        '200':
+          description: Comprehensive metrics
+
+  /lock/acquire:
+    post:
+      summary: Acquire Lock
+      tags: [Locks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resource, client_id, mode]
+              properties:
+                resource:
+                  type: string
+                  example: database_connection
+                client_id:
+                  type: string
+                  example: client123
+                mode:
+                  type: string
+                  enum: [shared, exclusive]
+                  example: exclusive
+                ttl:
+                  type: integer
+                  example: 300
+                wait:
+                  type: boolean
+                  example: false
+      responses:
+        '200':
+          description: Lock acquired or denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockResponse'
+        '409':
+          description: Deadlock detected
+
+  /lock/release:
+    post:
+      summary: Release Lock
+      tags: [Locks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resource, client_id]
+              properties:
+                resource:
+                  type: string
+                client_id:
+                  type: string
+      responses:
+        '200':
+          description: Lock released
+        '404':
+          description: Lock not found
+
+  /cache/put:
+    post:
+      summary: Put Value in Cache
+      tags: [Cache]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [key, value]
+              properties:
+                key:
+                  type: string
+                  example: user:123
+                value:
+                  type: object
+                  example: {"name": "Alice"}
+                ttl:
+                  type: integer
+                  example: 300
+      responses:
+        '200':
+          description: Value stored
+
+  /cache/get:
+    get:
+      summary: Get Value from Cache
+      tags: [Cache]
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cache hit or miss
+
+  /queue/push:
+    post:
+      summary: Push Message to Queue
+      tags: [Queue]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [queue, message]
+              properties:
+                queue:
+                  type: string
+                  example: orders
+                message:
+                  type: object
+                  example: {"order_id": 123}
+      responses:
+        '200':
+          description: Message pushed
+
+  /queue/pop:
+    post:
+      summary: Pop Message from Queue
+      tags: [Queue]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [queue]
+              properties:
+                queue:
+                  type: string
+      responses:
+        '200':
+          description: Message or empty
+
+components:
+  schemas:
+    ApiInfo:
+      type: object
+      properties:
+        service:
+          type: string
+        node_id:
+          type: string
+        version:
+          type: string
+        status:
+          type: string
+
+    HealthStatus:
+      type: object
+      properties:
+        node:
+          type: string
+        status:
+          type: string
+        uptime_seconds:
+          type: number
+        redis:
+          type: string
+        raft:
+          type: object
+
+    LockResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [granted, denied, deadlock_detected]
+        resource:
+          type: string
+        mode:
+          type: string
+        client_id:
+          type: string
