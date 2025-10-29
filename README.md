@@ -26,6 +26,7 @@ Akses http://localhost:8001/docs untuk Swagger UI
 
 
 ## Video dan Laporan
+Video: https://youtu.be/NU9q-9n8V2I 
 
 
 ## Testing
